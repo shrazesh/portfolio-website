@@ -1,12 +1,12 @@
 html, body {
-  background: #0f172a;   /* black / dark */
+  background: white;   /* black / dark */
   margin: 0;
   padding: 0;
 }
 .main {
   min-height: 100vh;
-  background: #0f172a;
-  color: white;
+  background: white;
+  color: black;
   font-family: Arial, Helvetica, sans-serif;
 }
 
@@ -16,25 +16,35 @@ html, body {
   align-items: center;
   justify-content: space-between;
   padding: 20px 40px;
-  background: #111827;
+  background: white;
 }
+
+
 
 .links a {
   margin-left: 20px;
   text-decoration: none;
-  color: rgb(251, 74, 74);
+  color: black;
+}
+
+.links a:hover {
+  color: #3b82f6;   /* blue */
 }
 
 .logo {
   font-weight: bold;
-  color: rgb(251, 74, 74);
+  color: black;
+}
+
+.logo:hover{
+  color:#3b82f6;
 }
 
 /* Hero */
 .hero {
   text-align: center;
   margin-top: 120px;
-  color: red;
+  color: black;
 }
 
 .btn {
@@ -52,6 +62,59 @@ html, body {
   text-align: center;
   padding: 30px;
   margin-top: 100px;
-  background: #111827;
-  color: rgb(251, 74, 74);
+  background: white;
+  color:black ;
+}
+
+/* ABOUT PAGE */
+
+.about {
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: black;
+}
+
+.about-container {
+  width: 80%;
+  max-width: 1000px;
+  text-align: center;
+}
+
+.about-container{
+  color: black;
+}
+.about h1 {
+  font-size: 40px;
+  margin-bottom: 20px;
+  color: black;
+}
+
+.about h3{
+  color: black;  
+  font-weight: 20px;
+  color: whitesmoke;
+}
+
+.about p {
+  font-size: 18px;
+  margin-bottom: 40px;
+  line-height: 1.6;
+
+}
+
+.about-cards {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
+  color: whitesmoke;
+}
+
+.card {
+  background: #1e293b;
+  padding: 20px;
+  width: 250px;
+  border-radius: 10px;
 }
