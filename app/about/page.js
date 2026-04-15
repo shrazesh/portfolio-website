@@ -21,7 +21,7 @@ export default function About() {
 
           <div className="card">
             <h3>📚 Learning</h3>
-            <p>System Design, MERN Stack, DevOps basics</p>
+            <p>System Design, MERN Stack.</p>
           </div>
         </div>
       </div>

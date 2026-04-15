@@ -118,3 +118,60 @@ html, body {
   width: 250px;
   border-radius: 10px;
 }
+
+.card {
+  background: #1e293b;
+  padding: 20px;
+  width: 250px;
+  border-radius: 10px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+}
+
+.card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+}
+
+/* PROJECTS PAGE */
+
+.projects {
+  min-height: 80vh;
+  padding: 60px 20px;
+  color: white;
+  text-align: center;
+}
+
+.projects h1 {
+  font-size: 40px;
+  margin-bottom: 40px;
+}
+
+.project-container {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  flex-wrap: wrap;
+}
+
+.project-card {
+  background: #1e293b;
+  width: 300px;
+  padding: 25px;
+  border-radius: 12px;
+  transition: transform 0.3s ease;
+}
+
+.project-card:hover {
+  transform: translateY(-8px);
+}
+
+.project-card button {
+  margin-top: 15px;
+  padding: 8px 15px;
+  background: #3b82f6;
+  border: none;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+}
