@@ -131,6 +131,7 @@ html, body {
 .card:hover {
   transform: translateY(-8px);
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+  /* color:#3b82f6; */
 }
 
 /* PROJECTS PAGE */
