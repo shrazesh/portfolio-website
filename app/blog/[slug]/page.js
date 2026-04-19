@@ -1,17 +1,28 @@
 import blogs from "@/data/blogs";
+import Image from "next/image";
 
-export default function BlogDetails({ params }) {
-  const blog = blogs.find((b) => b.slug === params.slug);
+export default async function BlogDetails({ params }) {
+  const { slug } = await params;   // ✅ IMPORTANT FIX
 
-  if (!blog) {
-    return <h1>Blog not found</h1>;
-  }
+  const blog = blogs.find((b) => b.slug === slug);
+
+  if (!blog) return <h2>Blog not found</h2>;
 
   return (
-    <div style={{ padding: "60px", textAlign: "center" }}>
+    <div style={{ maxWidth: "800px", margin: "auto", padding: "20px" }}>
       <h1>{blog.title}</h1>
-      <p>{blog.description}</p>
-      <p>{blog.content}</p>
+
+      <p style={{ color: "gray" }}>
+        By {blog.author} | {blog.date}
+      </p>
+
+        
+        
+      
+
+      <p style={{ marginTop: "20px", lineHeight: "1.8" }}>
+        {blog.content}
+      </p>
     </div>
   );
 }
