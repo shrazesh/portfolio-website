@@ -1,21 +1,35 @@
 import Link from "next/link";
-import  blogs  from "@/data/blogs"; // ✅ FIX
+import Image from "next/image";
+import blogs from "@/data/blogs";
 
 export default function BlogPage() {
   return (
-    <div style={{ padding: "60px 40px" }}>
-      <h1>My Blog</h1>
+    <div className="max-w-4xl mx-auto p-6">
+      <h1 className="text-4xl font-bold mb-10">My Blogs</h1>
 
-      {blogs.map((blog) => (
-        <div key={blog.slug} style={{ marginBottom: "30px" }}>
-          <h2>{blog.title}</h2>
-          <p>{blog.description}</p>
+      <div className="grid gap-10">
+        {blogs.map((blog) => (
+          <div key={blog.slug} className="border rounded-lg p-5 shadow">
+            <Image
+              src={blog.image}
+              alt={blog.title}
+              width={800}
+              height={400}
+              className="rounded-md"
+            />
 
-          <Link href={`/blog/${blog.slug}`}>
-            Read More →
-          </Link>
-        </div>
-      ))}
+            <h2 className="text-2xl font-semibold mt-4">{blog.title}</h2>
+            <p className="text-gray-600">{blog.description}</p>
+
+            <Link
+              href={`/blog/${blog.slug}`}
+              className="text-blue-600 font-medium mt-2 inline-block"
+            >
+              Read More →
+            </Link>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
