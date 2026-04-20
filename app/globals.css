@@ -291,3 +291,25 @@ section {
   margin-bottom: 16px;
   font-size: 18px;
 }
+
+.back-btn {
+  display: inline-block;
+  margin-bottom: 20px;
+  color: #3b82f6;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.blog-nav {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 60px;
+  padding-top: 30px;
+  border-top: 1px solid #ddd;
+}
+
+.blog-nav a {
+  color: #3b82f6;
+  text-decoration: none;
+  font-weight: 600;
+}

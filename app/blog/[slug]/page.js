@@ -1,30 +1,61 @@
-import Image from "next/image";
+import ReactMarkdown from "react-markdown";
+import { notFound } from "next/navigation";
 import blogs from "@/data/blogs";
+import Link from "next/link";
+import Image from "next/image";
+// import { notFound } from "next/navigation";
 
 export default async function BlogDetails({ params }) {
-  const { slug } = await params;   // ✅ IMPORTANT FIX
-  const blog = blogs.find((b) => b.slug === slug);
-  // const blog = blogs.find((b) => b.slug === params.slug);
+  const { slug } = await params;   // ✅ important
 
-  if (!blog) return <h2 className="p-6">Blog not found</h2>;
+  // ✅ use slug, NOT params.slug
+  const blogIndex = blogs.findIndex((b) => b.slug === slug);
+
+  // If blog not found → show 404 page
+  if (blogIndex === -1) {
+    notFound();
+  }
+
+  const blog = blogs[blogIndex];
 
   return (
-    <div className="max-w-3xl mx-auto p-6">
+    <div style={{ padding: "40px" }}>
+      {/* 🔙 Back Button */}
+      <Link href="/blog" className="back-btn">
+        ← Back to Blogs
+      </Link>
+
+      {/* 🖼 Blog Image */}
       <Image
         src={blog.image}
-        alt={blog.title}
         width={900}
-        height={450}
-        className="rounded-lg"
+        height={400}
+        alt={blog.title}
+        loading="eager"
       />
 
-      <h1 className="text-4xl font-bold mt-6">{blog.title}</h1>
-      <p className="text-gray-500 mt-2">
-        By {blog.author} | {blog.date}
-      </p>
+      {/* 📝 Blog Content */}
+      <h1>{blog.title}</h1>
+      <p><strong>By {blog.author}</strong> | {blog.date}</p>
+      <div className="prose max-w-none">
+        <ReactMarkdown>
+          {blog.content}
+        </ReactMarkdown>
+      </div>
+      
+      {/* ⬅️➡️ Previous / Next Navigation */}
+      <div className="blog-nav">
+        {blogIndex > 0 && (
+          <Link href={`/blog/${blogs[blogIndex - 1].slug}`}>
+            ← {blogs[blogIndex - 1].title}
+          </Link>
+        )}
 
-      <div className="mt-6 leading-8 text-lg whitespace-pre-line">
-        {blog.content}
+        {blogIndex < blogs.length - 1 && (
+          <Link href={`/blog/${blogs[blogIndex + 1].slug}`}>
+            {blogs[blogIndex + 1].title} →
+          </Link>
+        )}
       </div>
     </div>
   );
