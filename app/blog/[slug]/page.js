@@ -1,13 +1,24 @@
+import fs from "fs/promises";
+import path from "path";
 export const dynamic = "force-dynamic";
+
 import ReactMarkdown from "react-markdown";
 import { notFound } from "next/navigation";
-import blogs from "@/data/blogs";
+
 import Link from "next/link";
 import Image from "next/image";
 // import { notFound } from "next/navigation";
 
+async function getBlogs() {
+  const filePath = path.join(process.cwd(), "data", "blogs.json");
+  const data = await fs.readFile(filePath, "utf-8");
+  return JSON.parse(data);
+}
+
 export default async function BlogDetails({ params }) {
   const { slug } = await params;   // ✅ important
+
+  const blogs = await getBlogs();  // ✅ always fresh
 
   // ✅ use slug, NOT params.slug
   const blogIndex = blogs.findIndex((b) => b.slug === slug);
@@ -18,6 +29,7 @@ export default async function BlogDetails({ params }) {
   }
 
   const blog = blogs[blogIndex];
+  console.log("BLOG LOADED:", blog.title);
 
   return (
   <div className="max-w-4xl mx-auto px-6 py-10">
