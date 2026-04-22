@@ -1,8 +1,17 @@
+import fs from "fs/promises";
+import path from "path";
 import Link from "next/link";
 import Image from "next/image";
-import blogs from "@/data/blogs";
 
-export default function BlogPage() {
+async function getBlogs() {
+  const filePath = path.join(process.cwd(), "data", "blogs.json");
+  const data = await fs.readFile(filePath, "utf-8");
+  return JSON.parse(data);
+}
+
+export default async function BlogPage() {
+  const blogs = await getBlogs();
+
   return (
     <div className="max-w-4xl mx-auto p-6">
       <h1 className="text-4xl font-bold mb-10">My Blogs</h1>

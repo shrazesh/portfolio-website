@@ -1,11 +1,12 @@
 [
 {
   "slug": "react-basics",
-  "title": "React Basics FINAL TEST",
+  "title": "React Basics",
   "description": "Introduction to React fundamentals",
   "image": "/images/react.jpg",
   "author": "Shrajesh",
   "date": "2026-04-12",
+  "excerpt": "Learn the fundamentals of React in a simple way.",
   "content": "# THIS IS WORKING ✅\n\n## Big Heading Test\n\nThis text should be BIG and styled.\n\n- Item One\n- Item Two\n\n### Red Alert\n\nIf you can see this, your markdown and data loading are correct."
 },
   {

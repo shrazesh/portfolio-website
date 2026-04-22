@@ -1,3 +1,6 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 :root {
   --bg-main: #F8F9FA;
   --bg-section: #FFFFFF;
@@ -95,16 +98,24 @@ html, body {
   background: var(--bg-section);
 }
 
-.btn {
+.btn-group {
   margin-top: 30px;
+  text-align: center;
+}
+
+.btn {
+  display: inline-block;
   padding: 12px 28px;
   background: var(--accent);
   color: white;
   border-radius: 6px;
   text-decoration: none;
-  display: inline-block;
   transition: 0.3s;
   box-shadow: 0 8px 12px rgba(46, 91, 255, 0.35);
+}
+
+.btn + .btn {
+  margin-left: 50px;   /*  guaranteed spacing */
 }
 
 .btn:hover {

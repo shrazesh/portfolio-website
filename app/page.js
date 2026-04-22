@@ -3,7 +3,9 @@ export default function Home() {
     <section className="hero">
       <h1>Hi, I am Shrajesh 👋</h1>
       <p>MERN Stack Learner</p>
+
       <a href="/projects" className="btn">View My Projects</a>
+      <a href="/blog" className="btn">Read My Blogs</a>
     </section>
   );
 }
