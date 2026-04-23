@@ -1,0 +1,18 @@
+[
+  {
+    "slug": "food-ordering-system",
+    "title": "Online Food Ordering System",
+    "description": "A MERN stack based food ordering platform with multiple restaurants and online payment.",
+    "image": "/images/food.jpg",
+    "tech": ["React", "Node.js", "MongoDB", "Express"],
+    "github": "https://github.com/yourusername/food-ordering-system"
+  },
+  {
+    "slug": "portfolio-website",
+    "title": "Personal Portfolio Website",
+    "description": "A modern portfolio built with Next.js and Tailwind CSS.",
+    "image": "/images/portfolio.jpg",
+    "tech": ["Next.js", "Tailwind CSS"],
+    "github": "https://github.com/yourusername/portfolio"
+  }
+]
