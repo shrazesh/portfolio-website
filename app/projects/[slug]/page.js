@@ -1,5 +1,3 @@
-import fs from "fs/promises";
-import path from "path";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -7,17 +5,16 @@ import Link from "next/link";
 export const dynamic = "force-dynamic";
 
 async function getProjects() {
-  const filePath = path.join(process.cwd(), "data", "projects.json");
-  const data = await fs.readFile(filePath, "utf-8");
-  return JSON.parse(data);
+  const res = await fetch("http://localhost:3000/api/projects", {
+    cache: "no-store",
+  });
+  return res.json();
 }
 
 export default async function ProjectDetails({ params }) {
-  // ✅ IMPORTANT FIX
-  const { slug } = await params;
+  const { slug } = params;
 
   const projects = await getProjects();
-
   const project = projects.find((p) => p.slug === slug);
 
   if (!project) {

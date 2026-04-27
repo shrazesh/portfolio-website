@@ -1,12 +1,11 @@
-import fs from "fs/promises";
-import path from "path";
 import Image from "next/image";
 import Link from "next/link";
 
 async function getProjects() {
-  const filePath = path.join(process.cwd(), "data", "projects.json");
-  const data = await fs.readFile(filePath, "utf-8");
-  return JSON.parse(data);
+  const res = await fetch("http://localhost:3000/api/projects", {
+    cache: "no-store",
+  });
+  return res.json();
 }
 
 export default async function ProjectsPage() {
