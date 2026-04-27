@@ -6,79 +6,118 @@ export default function AddProjectPage() {
   const [form, setForm] = useState({
     title: "",
     slug: "",
-    description: "",
     image: "",
+    description: "",
     tech: "",
   });
 
-  const handleChange = (e) => {
+  const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     await fetch("/api/projects", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         ...form,
         tech: form.tech.split(",").map((t) => t.trim()),
       }),
     });
 
-    alert("Project Added!");
+    alert("Project Added Successfully!");
   };
 
   return (
-    <div className="max-w-3xl mx-auto py-12 px-6">
-      <h1 className="text-3xl font-bold mb-8">Add New Project</h1>
+    <div className="min-h-screen bg-gray-50 py-20 px-6 flex justify-center">
+      <div className="w-full max-w-4xl bg-white rounded-2xl shadow-2xl p-12">
+        {/* Heading */}
+        <h1 className="text-5xl font-extrabold text-center text-gray-800 mb-14">
+          Add New Project
+        </h1>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <input
-          name="title"
-          placeholder="Project Title"
-          onChange={handleChange}
-          className="w-full border p-3 rounded"
-          required
-        />
+        <form onSubmit={handleSubmit} className="space-y-10">
+          {/* Row 1 */}
+          <div className="grid md:grid-cols-2 gap-8">
+            <div className="flex flex-col gap-2">
+              <label className="font-semibold text-gray-700">
+                Project Title
+              </label>
+              <input
+                name="title"
+                onChange={handleChange}
+                className="input-style"
+                placeholder="e.g. E-commerce website"
+                required
+              />
+            </div>
 
-        <input
-          name="slug"
-          placeholder="project-slug"
-          onChange={handleChange}
-          className="w-full border p-3 rounded"
-          required
-        />
+            <div className="flex flex-col gap-2">
+              <label className="font-semibold text-gray-700">
+                Project Slug
+              </label>
+              <input
+                name="slug"
+                onChange={handleChange}
+                className="input-style"
+                placeholder="lowercase-with-hyphens (e.g. online-food-ordering)"
+                required
+              />
+            </div>
+          </div>
 
-        <input
-          name="image"
-          placeholder="/images/project.png"
-          onChange={handleChange}
-          className="w-full border p-3 rounded"
-          required
-        />
+          {/* Row 2 */}
+          <div className="flex flex-col gap-2">
+            <label className="font-semibold text-gray-700">Image Path</label>
+            <input
+              name="image"
+              onChange={handleChange}
+              className="input-style"
+              placeholder="/images/project-name.png (image must be inside public/images)"
+              required
+            />
+          </div>
 
-        <textarea
-          name="description"
-          placeholder="Project Description"
-          onChange={handleChange}
-          className="w-full border p-3 rounded"
-          required
-        />
+          {/* Row 3 */}
+          <div className="flex flex-col gap-2">
+            <label className="font-semibold text-gray-700">
+              Project Description
+            </label>
+            <textarea
+              name="description"
+              onChange={handleChange}
+              rows="5"
+              className="input-style"
+              placeholder="Describe your project..."
+              required
+            />
+          </div>
 
-        <input
-          name="tech"
-          placeholder="React, Node, MongoDB"
-          onChange={handleChange}
-          className="w-full border p-3 rounded"
-          required
-        />
+          {/* Row 4 */}
+          <div className="flex flex-col gap-2">
+            <label className="font-semibold text-gray-700">
+              Technologies (comma separated)
+            </label>
+            <input
+              name="tech"
+              onChange={handleChange}
+              className="input-style"
+              placeholder="Comma separated: React, Next.js, Node.js, MongoDB, Tailwind CSS"
+              required
+            />
+          </div>
 
-        <button className="bg-black text-white px-6 py-3 rounded">
-          Add Project
-        </button>
-      </form>
+          {/* Button */}
+          <div className="pt-6">
+            <button
+              type="submit"
+              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-lg font-semibold py-4 rounded-xl transition-all duration-300 shadow-md hover:shadow-lg"
+            >
+              Add Project
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }
