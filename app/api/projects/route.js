@@ -1,22 +1,35 @@
-import { readFile, writeFile } from "fs/promises";
-import path from "path";
-
-const filePath = path.join(process.cwd(), "data", "projects.json");
+import { connectDB } from "@/lib/mongodb";
+import Project from "@/models/Project";
 
 // GET all projects
 export async function GET() {
-  const data = await readFile(filePath, "utf-8");
-  return Response.json(JSON.parse(data));
+  try {
+    await connectDB();
+
+    const projects = await Project.find({}).lean();
+
+    return Response.json(projects);
+  } catch (error) {
+    console.error("GET Projects Error:", error);
+    return Response.json(
+      { error: "Failed to fetch projects" },
+      { status: 500 },
+    );
+  }
 }
 
 // ADD new project
 export async function POST(req) {
-  const newProject = await req.json();
+  try {
+    await connectDB();
 
-  const data = JSON.parse(await readFile(filePath, "utf-8"));
-  data.push(newProject);
+    const body = await req.json();
 
-  await writeFile(filePath, JSON.stringify(data, null, 2));
+    await Project.create(body);
 
-  return Response.json({ message: "Project added" });
+    return Response.json({ message: "Project added to MongoDB ✅" });
+  } catch (error) {
+    console.error("POST Project Error:", error);
+    return Response.json({ error: "Failed to add project" }, { status: 500 });
+  }
 }

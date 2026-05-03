@@ -6,6 +6,12 @@ async function getProjects() {
   const res = await fetch("http://localhost:3000/api/projects", {
     cache: "no-store",
   });
+
+  if (!res.ok) {
+    console.error("Failed to fetch projects");
+    return [];
+  }
+
   return res.json();
 }
 
