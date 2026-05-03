@@ -12,7 +12,7 @@ async function getProjects() {
 }
 
 export default async function ProjectDetails({ params }) {
-  const { slug } = params;
+  const { slug } = await params;
 
   const projects = await getProjects();
   const project = projects.find((p) => p.slug === slug);
@@ -42,10 +42,7 @@ export default async function ProjectDetails({ params }) {
 
       <div className="flex gap-2 mt-6 flex-wrap">
         {project.tech?.map((t, i) => (
-          <span
-            key={i}
-            className="bg-gray-200 px-3 py-1 rounded-full text-sm"
-          >
+          <span key={i} className="bg-gray-200 px-3 py-1 rounded-full text-sm">
             {t}
           </span>
         ))}
