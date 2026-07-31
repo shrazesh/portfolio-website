@@ -8,11 +8,14 @@ export async function GET() {
   try {
     await connectDB();
 
-    const projects = await Project.find({}).lean();
+    const projects = await Project.find({})
+      .sort({ order: 1, createdAt: -1 })
+      .lean();
 
     return Response.json(projects);
   } catch (error) {
     console.error("GET Projects Error:", error);
+
     return Response.json(
       { error: "Failed to fetch projects" },
       { status: 500 },
