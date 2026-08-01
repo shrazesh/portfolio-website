@@ -1,108 +1,193 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function AddProjectPage() {
+  const router = useRouter();
+  const fileRef = useRef(null);
+
+  const [loading, setLoading] = useState(false);
+
   const [form, setForm] = useState({
     title: "",
     slug: "",
     image: null,
     description: "",
     tech: "",
+    github: "",
+    live: "",
   });
 
-  const handleFileChange = (e) => {
-    setForm({ ...form, image: e.target.files[0] });
+  const handleChange = (e) => {
+    setForm((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
   };
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+  const handleFileChange = (e) => {
+    setForm((prev) => ({
+      ...prev,
+      image: e.target.files[0],
+    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const formData = new FormData();
-    formData.append("title", form.title);
-    formData.append("slug", form.slug);
-    formData.append("description", form.description);
-    formData.append(
-      "tech",
-      JSON.stringify(form.tech.split(",").map((t) => t.trim())),
-    );
-    formData.append("image", form.image); // ⭐ file
+    if (loading) return;
 
-    const res = await fetch("/api/projects", {
-      method: "POST",
-      body: formData,
-    });
+    setLoading(true);
 
-    const data = await res.json();
-    alert(data.message);
+    try {
+      const formData = new FormData();
+
+      formData.append("title", form.title.trim());
+      formData.append("slug", form.slug.trim());
+      formData.append("description", form.description.trim());
+
+      formData.append(
+        "tech",
+        JSON.stringify(
+          form.tech
+            .split(",")
+            .map((item) => item.trim())
+            .filter(Boolean),
+        ),
+      );
+
+      formData.append("github", form.github.trim());
+      formData.append("live", form.live.trim());
+
+      if (form.image) {
+        formData.append("image", form.image);
+      }
+
+      const res = await fetch("/api/projects", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data.error || data.message || "Failed to add project.");
+        return;
+      }
+
+      alert(data.message || "Project added successfully!");
+
+      // Reset form
+      setForm({
+        title: "",
+        slug: "",
+        image: null,
+        description: "",
+        tech: "",
+        github: "",
+        live: "",
+      });
+
+      // Reset file input
+      if (fileRef.current) {
+        fileRef.current.value = "";
+      }
+
+      // Redirect (after Sprint 3 creates this page)
+      // router.push("/admin/projects");
+    } catch (error) {
+      console.error(error);
+      alert("Something went wrong.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-      <div className="w-full max-w-4xl bg-white shadow-xl rounded-2xl p-10">
-        <h1 className="text-4xl font-bold text-center mb-10 text-gray-800">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-12">
+      <div className="w-full max-w-5xl bg-white rounded-2xl shadow-xl p-10">
+        <h1 className="text-4xl font-bold text-center mb-10">
           Add New Project
         </h1>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Top Grid */}
+        <form onSubmit={handleSubmit} className="space-y-8">
           <div className="grid md:grid-cols-2 gap-6">
             <Input
-              label="Title"
+              label="Project Title"
               name="title"
-              placeholder="Project title"
+              value={form.title}
+              placeholder="Calorie Tracker"
               onChange={handleChange}
             />
+
             <Input
-              label="Slug (unique)"
+              label="Slug"
               name="slug"
-              placeholder="project-slug"
+              value={form.slug}
+              placeholder="calorie-tracker"
               onChange={handleChange}
             />
+
             <div>
-              <label className="block mb-2 font-medium text-gray-700">
-                Project Image
-              </label>
+              <label className="block mb-2 font-medium">Project Image</label>
+
               <input
+                ref={fileRef}
                 type="file"
                 accept="image/*"
                 onChange={handleFileChange}
-                className="w-full border border-gray-300 rounded-lg p-3"
+                className="w-full border rounded-lg p-3"
               />
             </div>
+
             <Input
               label="Tech Stack"
               name="tech"
-              placeholder="Next.js, MongoDB, Tailwind"
+              value={form.tech}
+              placeholder="Next.js, MongoDB, Tailwind CSS"
               onChange={handleChange}
             />
           </div>
 
-          {/* Description */}
           <div>
-            <label className="block mb-2 font-medium text-gray-700">
-              Description
-            </label>
+            <label className="block mb-2 font-medium">Description</label>
+
             <textarea
+              rows={6}
               name="description"
-              rows="5"
-              placeholder="Write project description..."
+              value={form.description}
               onChange={handleChange}
-              className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-black outline-none transition"
+              placeholder="Describe your project..."
+              className="w-full border rounded-lg p-3 focus:ring-2 focus:ring-black outline-none"
             />
           </div>
 
-          {/* Button */}
-          <div className="text-center pt-4">
+          <div className="grid md:grid-cols-2 gap-6">
+            <Input
+              label="GitHub URL (Optional)"
+              name="github"
+              value={form.github}
+              placeholder="https://github.com/username/project"
+              onChange={handleChange}
+            />
+
+            <Input
+              label="Live Demo URL (Optional)"
+              name="live"
+              value={form.live}
+              placeholder="https://example.com"
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="text-center">
             <button
               type="submit"
-              className="bg-black text-white px-10 py-3 rounded-lg font-semibold hover:scale-105 hover:bg-gray-900 transition"
+              disabled={loading}
+              className="bg-black text-white px-10 py-3 rounded-lg font-semibold hover:bg-gray-900 transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Add Project
+              {loading ? "Adding Project..." : "Add Project"}
             </button>
           </div>
         </form>
@@ -111,14 +196,14 @@ export default function AddProjectPage() {
   );
 }
 
-/* Reusable Input */
 function Input({ label, ...props }) {
   return (
     <div>
-      <label className="block mb-2 font-medium text-gray-700">{label}</label>
+      <label className="block mb-2 font-medium">{label}</label>
+
       <input
         {...props}
-        className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-black outline-none transition"
+        className="w-full border rounded-lg p-3 focus:ring-2 focus:ring-black outline-none"
       />
     </div>
   );

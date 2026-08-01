@@ -1,24 +1,25 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-
 export default function DeleteButton({ id }) {
-  const router = useRouter();
-
   async function handleDelete() {
-    const ok = confirm("Delete this project permanently?");
+    const confirmDelete = confirm("Are you sure you want to delete this blog?");
 
-    if (!ok) return;
+    if (!confirmDelete) return;
 
-    const res = await fetch(`/api/projects/${id}`, {
+    const res = await fetch(`/api/blogs/${id}`, {
       method: "DELETE",
     });
 
     const data = await res.json();
 
-    alert(data.message);
+    if (!res.ok) {
+      alert(data.message || "Delete failed");
+      return;
+    }
 
-    router.refresh();
+    alert("Blog deleted successfully");
+
+    location.reload();
   }
 
   return (

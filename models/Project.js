@@ -5,32 +5,22 @@ const ProjectSchema = new mongoose.Schema(
     title: {
       type: String,
       required: true,
-      trim: true,
     },
 
     slug: {
       type: String,
       required: true,
       unique: true,
-      lowercase: true,
-      trim: true,
     },
 
-    image: {
-      type: String,
-      required: true,
-    },
+    image: String,
 
     description: {
       type: String,
       required: true,
-      trim: true,
     },
 
-    tech: {
-      type: [String],
-      default: [],
-    },
+    tech: [String],
 
     github: {
       type: String,
@@ -40,11 +30,6 @@ const ProjectSchema = new mongoose.Schema(
     live: {
       type: String,
       default: "",
-    },
-
-    featured: {
-      type: Boolean,
-      default: false,
     },
 
     order: {

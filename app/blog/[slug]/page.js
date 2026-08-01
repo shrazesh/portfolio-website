@@ -1,93 +1,127 @@
-import fs from "fs/promises";
-import path from "path";
-export const dynamic = "force-dynamic";
-
-import ReactMarkdown from "react-markdown";
+import { connectDB } from "@/lib/mongodb";
+import Blog from "@/models/Blog";
 import { notFound } from "next/navigation";
-
 import Link from "next/link";
 import Image from "next/image";
-// import { notFound } from "next/navigation";
+import ReactMarkdown from "react-markdown";
 
-async function getBlogs() {
-  const filePath = path.join(process.cwd(), "data", "blogs.json");
-  const data = await fs.readFile(filePath, "utf-8");
-  return JSON.parse(data);
-}
+export const dynamic = "force-dynamic";
 
 export default async function BlogDetails({ params }) {
-  const { slug } = await params;   // ✅ important
+  const { slug } = await params;
 
-  const blogs = await getBlogs();  // ✅ always fresh
+  await connectDB();
 
-  // ✅ use slug, NOT params.slug
-  const blogIndex = blogs.findIndex((b) => b.slug === slug);
+  // Get current blog
+  const blog = await Blog.findOne({
+    slug,
+    published: true,
+  }).lean();
 
-  // If blog not found → show 404 page
-  if (blogIndex === -1) {
+  if (!blog) {
     notFound();
   }
 
-  const blog = blogs[blogIndex];
-  console.log("BLOG LOADED:", blog.title);
+  // Get all published blogs for previous/next navigation
+  const blogs = await Blog.find({
+    published: true,
+  })
+    .sort({ createdAt: -1 })
+    .lean();
+
+  const currentIndex = blogs.findIndex(
+    (b) => b._id.toString() === blog._id.toString(),
+  );
+
+  const previousBlog =
+    currentIndex < blogs.length - 1 ? blogs[currentIndex + 1] : null;
+
+  const nextBlog = currentIndex > 0 ? blogs[currentIndex - 1] : null;
 
   return (
-  <div className="max-w-4xl mx-auto px-6 py-10">
-    {/* 🔙 Back Button */}
-    <Link
-      href="/blog"
-      className="text-blue-600 hover:underline font-medium"
-    >
-      ← Back to Blogs
-    </Link>
+    <div className="max-w-5xl mx-auto px-6 py-12">
+      {/* Back */}
+      <Link href="/blog" className="text-blue-600 hover:underline font-medium">
+        ← Back to Blogs
+      </Link>
 
-    {/* 🖼 Blog Image */}
-    <div className="mt-6">
-      <Image
-        src={blog.image}
-        width={900}
-        height={400}
-        alt={blog.title}
-        loading="eager"
-        className="rounded-xl shadow-md w-full object-cover"
-      />
-    </div>
-
-    {/* 📝 Title */}
-    <h1 className="text-4xl font-bold mt-8 text-gray-900">
-      {blog.title}
-    </h1>
-
-    {/* ✍️ Author & Date */}
-    <p className="text-gray-500 mt-2">
-      <strong>By {blog.author}</strong> | {blog.date}
-    </p>
-
-    {/* 📄 Markdown Content */}
-    <div className="prose lg:prose-lg max-w-none mt-8 prose-headings:text-center">
-      <ReactMarkdown>{blog.content}</ReactMarkdown>
-    </div>
-
-    {/* ⬅️➡️ Previous / Next Navigation */}
-    <div className="flex justify-between items-center mt-12 border-t pt-6">
-      {blogIndex > 0 ? (
-        <Link
-          href={`/blog/${blogs[blogIndex - 1].slug}`}
-          className="text-blue-600 hover:underline"
-        >
-          ← {blogs[blogIndex - 1].title}
-        </Link>
-      ) : <div />}
-
-      {blogIndex < blogs.length - 1 && (
-        <Link
-          href={`/blog/${blogs[blogIndex + 1].slug}`}
-          className="text-blue-600 hover:underline"
-        >
-          {blogs[blogIndex + 1].title} →
-        </Link>
+      {/* Cover Image */}
+      {blog.coverImage && (
+        <div className="relative w-full h-[450px] mt-6 rounded-xl overflow-hidden shadow-lg">
+          <Image
+            src={blog.coverImage}
+            alt={blog.title}
+            fill
+            sizes="100vw"
+            className="object-cover"
+            priority
+          />
+        </div>
       )}
+
+      {/* Category */}
+      <div className="mt-8">
+        <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm">
+          {blog.category}
+        </span>
+      </div>
+
+      {/* Title */}
+      <h1 className="text-5xl font-bold mt-4">{blog.title}</h1>
+
+      {/* Date */}
+      <p className="text-gray-500 mt-3">
+        Published on {new Date(blog.createdAt).toLocaleDateString()}
+      </p>
+
+      {/* Tags */}
+      {blog.tags?.length > 0 && (
+        <div className="flex flex-wrap gap-2 mt-5">
+          {blog.tags.map((tag) => (
+            <span
+              key={tag}
+              className="bg-gray-100 px-3 py-1 rounded-full text-sm"
+            >
+              #{tag}
+            </span>
+          ))}
+        </div>
+      )}
+
+      {/* Excerpt */}
+      {blog.excerpt && (
+        <p className="text-xl text-gray-600 mt-8 italic">{blog.excerpt}</p>
+      )}
+
+      {/* Content */}
+      <article className="prose prose-lg max-w-none mt-10">
+        <ReactMarkdown>{blog.content}</ReactMarkdown>
+      </article>
+
+      {/* Previous / Next */}
+      <div className="border-t mt-16 pt-8 flex justify-between">
+        {previousBlog ? (
+          <Link
+            href={`/blog/${previousBlog.slug}`}
+            className="text-blue-600 hover:underline"
+          >
+            ← {previousBlog.title}
+          </Link>
+        ) : (
+          <div />
+        )}
+
+        {nextBlog ? (
+          <Link
+            href={`/blog/${nextBlog.slug}`}
+            className="text-blue-600 hover:underline"
+          >
+            {nextBlog.title} →
+          </Link>
+        ) : (
+          <div />
+        )}
+      </div>
     </div>
-  </div>
-);
- }
+  );
+}

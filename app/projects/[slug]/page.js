@@ -78,8 +78,8 @@ export default async function ProjectDetails({ params }) {
           src={project.image}
           alt={project.title}
           fill
-          priority
-          className="object-cover"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          className="object-cover rounded-xl"
         />
       </div>
 

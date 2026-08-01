@@ -1,7 +1,6 @@
 import { connectDB } from "@/lib/mongodb";
 import Project from "@/models/Project";
-import fs from "fs";
-import path from "path";
+import { uploadBuffer } from "@/lib/cloudinary";
 
 // GET all projects
 export async function GET() {
@@ -23,51 +22,90 @@ export async function GET() {
   }
 }
 
-// ADD new project (with image upload)
+// ADD new project
 export async function POST(req) {
   try {
     await connectDB();
 
-    // ✅ Read form data
     const data = await req.formData();
 
-    const title = data.get("title");
-    const slug = data.get("slug");
-    const description = data.get("description");
-    const tech = JSON.parse(data.get("tech"));
-    const file = data.get("image");
+    const title = data.get("title")?.trim();
+    const slug = data.get("slug")?.trim();
+    const description = data.get("description")?.trim();
 
-    // ✅ Prepare uploads folder
-    const uploadDir = path.join(process.cwd(), "public", "uploads");
+    const tech = JSON.parse(data.get("tech") || "[]");
 
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
+    const github = data.get("github") || "";
+    const live = data.get("live") || "";
+
+    // Required validation
+    if (!title || !slug || !description) {
+      return Response.json(
+        {
+          success: false,
+          error: "Title, Slug and Description are required.",
+        },
+        { status: 400 },
+      );
     }
 
-    // ✅ Save image file
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
+    // Duplicate slug validation
+    const existing = await Project.findOne({ slug });
 
-    const fileName = `${Date.now()}-${file.name}`;
-    const filePath = path.join(uploadDir, fileName);
+    if (existing) {
+      return Response.json(
+        {
+          success: false,
+          error: "This slug already exists. Please choose another slug.",
+        },
+        { status: 409 },
+      );
+    }
 
-    fs.writeFileSync(filePath, buffer);
+    let image = "";
 
-    // ✅ Image path to store in DB
-    const imagePath = `/uploads/${fileName}`;
+    const file = data.get("image");
 
-    // ✅ Save project to MongoDB
-    await Project.create({
+    if (file && file.size > 0) {
+      const bytes = await file.arrayBuffer();
+      const buffer = Buffer.from(bytes);
+
+      const uploaded = await uploadBuffer(buffer);
+
+      image = uploaded.secure_url;
+    }
+
+    const project = await Project.create({
       title,
       slug,
       description,
       tech,
-      image: imagePath,
+      github,
+      live,
+      image,
     });
 
-    return Response.json({ message: "Project added with image ✅" });
+    return Response.json(
+      {
+        success: true,
+        message: "Project added successfully!",
+        project,
+      },
+      {
+        status: 201,
+      },
+    );
   } catch (error) {
-    console.error("POST Project Error:", error);
-    return Response.json({ error: "Failed to add project" }, { status: 500 });
+    console.error(error);
+
+    return Response.json(
+      {
+        success: false,
+        error: error.message,
+      },
+      {
+        status: 500,
+      },
+    );
   }
 }

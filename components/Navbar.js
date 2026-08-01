@@ -22,9 +22,13 @@ export default function Navbar() {
   return (
     <nav className="w-full border-b bg-white shadow-sm">
       <div className="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
-        
         {/* Logo */}
-        <h2 className="text-2xl font-bold">Shrajesh</h2>
+        <Link
+          href="/"
+          className="text-3xl font-bold hover:text-blue-600 transition-colors duration-300"
+        >
+          Shrajesh
+        </Link>
 
         {/* Links */}
         <div className="flex gap-6 text-lg font-medium">

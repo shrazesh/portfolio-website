@@ -1,77 +1,204 @@
 "use client";
-import { useState } from "react";
 
-export default function Page() {
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+
+export default function AddBlogPage() {
+  const router = useRouter();
+
   const [form, setForm] = useState({
-    slug: "",
     title: "",
-    description: "",
-    image: "",
-    author: "",
+    slug: "",
+    excerpt: "",
     content: "",
+    category: "General",
+    tags: "",
+    coverImage: null,
+    featured: false,
+    published: true,
   });
 
-  const handleSubmit = async (e) => {
+  const [loading, setLoading] = useState(false);
+
+  function handleChange(e) {
+    const { name, value, type, checked } = e.target;
+
+    setForm({
+      ...form,
+      [name]: type === "checkbox" ? checked : value,
+    });
+  }
+
+  function handleImage(e) {
+    setForm({
+      ...form,
+      coverImage: e.target.files[0],
+    });
+  }
+
+  async function handleSubmit(e) {
     e.preventDefault();
 
-    await fetch("/api/blogs", {
+    setLoading(true);
+
+    const formData = new FormData();
+
+    formData.append("title", form.title);
+    formData.append("slug", form.slug);
+    formData.append("excerpt", form.excerpt);
+    formData.append("content", form.content);
+    formData.append("category", form.category);
+
+    formData.append(
+      "tags",
+      JSON.stringify(
+        form.tags
+          .split(",")
+          .map((tag) => tag.trim())
+          .filter(Boolean),
+      ),
+    );
+
+    formData.append("featured", form.featured);
+    formData.append("published", form.published);
+
+    if (form.coverImage) {
+      formData.append("coverImage", form.coverImage);
+    }
+
+    const res = await fetch("/api/blogs", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        ...form,
-        date: new Date().toISOString().split("T")[0],
-      }),
+      body: formData,
     });
 
-    alert("Blog Added!");
-  };
+    const data = await res.json();
+
+    setLoading(false);
+
+    if (!res.ok) {
+      alert(data.error);
+      return;
+    }
+
+    alert("Blog created successfully!");
+
+    router.push("/admin/blogs");
+    router.refresh();
+  }
 
   return (
-    <div className="max-w-3xl mx-auto py-12 px-6">
-      <h1 className="text-3xl font-bold mb-8 text-center">Add New Blog</h1>
+    <div className="min-h-screen bg-gray-100 py-12">
+      <div className="max-w-5xl mx-auto bg-white shadow-xl rounded-2xl p-10">
+        <h1 className="text-4xl font-bold mb-10">Add New Blog</h1>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <input
-          className="w-full border p-3 rounded"
-          placeholder="Slug (react-basics)"
-          onChange={(e) => setForm({ ...form, slug: e.target.value })}
-        />
+        <form onSubmit={handleSubmit} className="space-y-7">
+          <Input
+            label="Blog Title"
+            name="title"
+            value={form.title}
+            onChange={handleChange}
+          />
 
-        <input
-          className="w-full border p-3 rounded"
-          placeholder="Blog Title"
-          onChange={(e) => setForm({ ...form, title: e.target.value })}
-        />
+          <Input
+            label="Slug"
+            name="slug"
+            value={form.slug}
+            onChange={handleChange}
+          />
 
-        <input
-          className="w-full border p-3 rounded"
-          placeholder="Short Description"
-          onChange={(e) => setForm({ ...form, description: e.target.value })}
-        />
+          <Input
+            label="Excerpt"
+            name="excerpt"
+            value={form.excerpt}
+            onChange={handleChange}
+          />
 
-        <input
-          className="w-full border p-3 rounded"
-          placeholder="/images/blog.jpg"
-          onChange={(e) => setForm({ ...form, image: e.target.value })}
-        />
+          <div>
+            <label className="block mb-2 font-semibold">Blog Content</label>
 
-        <input
-          className="w-full border p-3 rounded"
-          placeholder="Author Name"
-          onChange={(e) => setForm({ ...form, author: e.target.value })}
-        />
+            <textarea
+              rows={10}
+              name="content"
+              value={form.content}
+              onChange={handleChange}
+              className="w-full border rounded-lg p-4"
+            />
+          </div>
 
-        <textarea
-          rows="10"
-          className="w-full border p-3 rounded"
-          placeholder="Write blog content here..."
-          onChange={(e) => setForm({ ...form, content: e.target.value })}
-        />
+          <div className="grid md:grid-cols-2 gap-6">
+            <div>
+              <label className="block mb-2 font-semibold">Category</label>
 
-        <button className="bg-black text-white px-6 py-3 rounded w-full">
-          Add Blog
-        </button>
-      </form>
+              <select
+                name="category"
+                value={form.category}
+                onChange={handleChange}
+                className="w-full border rounded-lg p-3"
+              >
+                <option>General</option>
+                <option>AI</option>
+                <option>MERN</option>
+                <option>Next.js</option>
+                <option>React</option>
+                <option>Python</option>
+              </select>
+            </div>
+
+            <Input
+              label="Tags"
+              name="tags"
+              placeholder="React, AI, MERN"
+              value={form.tags}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div>
+            <label className="block mb-2 font-semibold">Cover Image</label>
+
+            <input type="file" accept="image/*" onChange={handleImage} />
+          </div>
+
+          <div className="flex gap-8">
+            <label className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                name="featured"
+                checked={form.featured}
+                onChange={handleChange}
+              />
+              Featured Blog
+            </label>
+
+            <label className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                name="published"
+                checked={form.published}
+                onChange={handleChange}
+              />
+              Publish
+            </label>
+          </div>
+
+          <button
+            disabled={loading}
+            className="bg-black text-white px-8 py-3 rounded-lg hover:bg-gray-900"
+          >
+            {loading ? "Creating..." : "Create Blog"}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+function Input({ label, ...props }) {
+  return (
+    <div>
+      <label className="block mb-2 font-semibold">{label}</label>
+
+      <input {...props} className="w-full border rounded-lg p-3" />
     </div>
   );
 }

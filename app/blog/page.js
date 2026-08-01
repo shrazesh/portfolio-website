@@ -1,40 +1,86 @@
-import fs from "fs/promises";
-import path from "path";
+import { connectDB } from "@/lib/mongodb";
+import Blog from "@/models/Blog";
 import Link from "next/link";
 import Image from "next/image";
 
 export const dynamic = "force-dynamic";
 
 async function getBlogs() {
-  const filePath = path.join(process.cwd(), "data", "blogs.json");
-  const data = await fs.readFile(filePath, "utf-8");
-  return JSON.parse(data);
+  await connectDB();
+
+  const blogs = await Blog.find({
+    published: true,
+  })
+    .sort({ createdAt: -1 })
+    .lean();
+
+  return blogs;
 }
 
 export default async function BlogPage() {
   const blogs = await getBlogs();
 
   return (
-    <div className="max-w-5xl mx-auto py-12 px-6">
+    <div className="max-w-6xl mx-auto py-12 px-6">
       <h1 className="text-4xl font-bold mb-10">My Blogs</h1>
 
-      <div className="grid gap-8">
-        {blogs.map((blog) => (
-          <Link key={blog.slug} href={`/blog/${blog.slug}`}>
-            <div className="border rounded-xl p-5 shadow hover:shadow-lg">
-              <Image
-                src={blog.image}
-                width={800}
-                height={400}
-                alt={blog.title}
-                className="rounded-md"
-              />
-              <h2 className="text-2xl mt-4 font-semibold">{blog.title}</h2>
-              <p className="text-gray-600">{blog.description}</p>
-            </div>
-          </Link>
-        ))}
-      </div>
+      {blogs.length === 0 ? (
+        <div className="text-center py-20">
+          <h2 className="text-2xl font-semibold">No blogs found.</h2>
+          <p className="text-gray-500 mt-2">
+            Create your first blog from the Admin Dashboard.
+          </p>
+        </div>
+      ) : (
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {blogs.map((blog) => (
+            <Link
+              key={blog._id.toString()}
+              href={`/blog/${blog.slug}`}
+              className="group"
+            >
+              <article className="bg-white rounded-xl overflow-hidden shadow hover:shadow-xl transition">
+                {blog.coverImage && (
+                  <div className="relative h-56">
+                    <Image
+                      src={blog.coverImage}
+                      alt={blog.title}
+                      fill
+                      sizes="(max-width:768px)100vw,(max-width:1200px)50vw,33vw"
+                      className="object-cover group-hover:scale-105 transition duration-300"
+                    />
+                  </div>
+                )}
+
+                <div className="p-5">
+                  <span className="text-sm text-blue-600 font-medium">
+                    {blog.category}
+                  </span>
+
+                  <h2 className="text-2xl font-bold mt-2 group-hover:text-blue-600 transition">
+                    {blog.title}
+                  </h2>
+
+                  <p className="text-gray-600 mt-3 line-clamp-3">
+                    {blog.excerpt}
+                  </p>
+
+                  <div className="mt-5 flex flex-wrap gap-2">
+                    {blog.tags?.map((tag) => (
+                      <span
+                        key={tag}
+                        className="bg-gray-100 text-sm px-2 py-1 rounded"
+                      >
+                        #{tag}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </article>
+            </Link>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
