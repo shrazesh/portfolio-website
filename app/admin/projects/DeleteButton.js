@@ -1,24 +1,32 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 export default function DeleteButton({ id }) {
-  const router = useRouter();
-
   async function handleDelete() {
-    const ok = confirm("Delete this project permanently?");
+    const confirmed = confirm("Are you sure you want to delete this project?");
 
-    if (!ok) return;
+    if (!confirmed) return;
 
-    const res = await fetch(`/api/projects/${id}`, {
-      method: "DELETE",
-    });
+    try {
+      const res = await fetch(`/api/projects/${id}`, {
+        method: "DELETE",
+      });
 
-    const data = await res.json();
+      const data = await res.json();
 
-    alert(data.message);
+      if (!res.ok) {
+        toast.error(data.message || "Delete failed.");
+        return;
+      }
 
-    router.refresh();
+      toast.success("Project deleted successfully!");
+
+      location.reload();
+    } catch (error) {
+      console.error(error);
+      toast.error("Something went wrong.");
+    }
   }
 
   return (

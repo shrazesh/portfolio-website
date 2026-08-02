@@ -2,14 +2,12 @@ import { connectDB } from "@/lib/mongodb";
 import Blog from "@/models/Blog";
 import { NextResponse } from "next/server";
 
-// ======================
 // GET SINGLE BLOG
-// ======================
 export async function GET(request, { params }) {
   try {
-    await connectDB();
-
     const { id } = await params;
+
+    await connectDB();
 
     const blog = await Blog.findById(id).lean();
 
@@ -19,13 +17,15 @@ export async function GET(request, { params }) {
           success: false,
           message: "Blog not found",
         },
-        { status: 404 },
+        {
+          status: 404,
+        },
       );
     }
 
     return NextResponse.json({
       success: true,
-      blog,
+      data: blog,
     });
   } catch (error) {
     return NextResponse.json(
@@ -33,7 +33,9 @@ export async function GET(request, { params }) {
         success: false,
         message: error.message,
       },
-      { status: 500 },
+      {
+        status: 500,
+      },
     );
   }
 }

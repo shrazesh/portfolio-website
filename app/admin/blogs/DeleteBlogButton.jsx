@@ -1,5 +1,7 @@
 "use client";
 
+import toast from "react-hot-toast";
+
 export default function DeleteBlogButton({ id }) {
   async function handleDelete() {
     const confirmed = confirm(
@@ -8,26 +10,31 @@ export default function DeleteBlogButton({ id }) {
 
     if (!confirmed) return;
 
-    const res = await fetch(`/api/blogs/${id}`, {
-      method: "DELETE",
-    });
+    try {
+      const res = await fetch(`/api/blogs/${id}`, {
+        method: "DELETE",
+      });
 
-    const data = await res.json();
+      const data = await res.json();
 
-    if (!res.ok) {
-      alert(data.message || "Failed to delete.");
-      return;
+      if (!res.ok) {
+        toast.error(data.message || "Delete failed.");
+        return;
+      }
+
+      toast.success("Blog deleted successfully!");
+
+      location.reload();
+    } catch (error) {
+      console.error(error);
+      toast.error("Something went wrong.");
     }
-
-    alert("Blog deleted successfully!");
-
-    location.reload();
   }
 
   return (
     <button
       onClick={handleDelete}
-      className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700"
+      className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg"
     >
       Delete
     </button>

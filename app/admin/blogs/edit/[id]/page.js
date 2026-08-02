@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 export default function EditBlogPage() {
   const { id } = useParams();
@@ -20,23 +21,20 @@ export default function EditBlogPage() {
     featured: false,
     published: true,
   });
-
   useEffect(() => {
-    if (!id) return;
-
     async function loadBlog() {
       try {
         const res = await fetch(`/api/blogs/${id}`);
 
-        const data = await res.json();
+        const result = await res.json();
 
-        if (!res.ok) {
-          alert(data.message || "Blog not found");
+        if (!res.ok || !result.success) {
+          toast.error(result.message || "Blog not found");
           router.push("/admin/blogs");
           return;
         }
 
-        const blog = data.blog;
+        const blog = result.data;
 
         setForm({
           title: blog.title || "",
@@ -44,20 +42,22 @@ export default function EditBlogPage() {
           excerpt: blog.excerpt || "",
           content: blog.content || "",
           category: blog.category || "General",
-          tags: blog.tags?.join(", ") || "",
+          tags: Array.isArray(blog.tags) ? blog.tags.join(", ") : "",
           coverImage: blog.coverImage || "",
-          featured: blog.featured || false,
+          featured: blog.featured ?? false,
           published: blog.published ?? true,
         });
-      } catch (error) {
-        console.error(error);
-        alert("Failed to load blog.");
-      } finally {
+
         setLoading(false);
+      } catch (err) {
+        console.error(err);
+        toast.error("Failed to load blog.");
       }
     }
 
-    loadBlog();
+    if (id) {
+      loadBlog();
+    }
   }, [id, router]);
 
   function handleChange(e) {
@@ -90,17 +90,17 @@ export default function EditBlogPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        alert(data.message || "Update failed");
+        toast.error(data.message || "Update failed.");
         return;
       }
 
-      alert("Blog updated successfully!");
+      toast.success("Blog updated successfully!");
 
       router.push("/admin/blogs");
       router.refresh();
     } catch (error) {
       console.error(error);
-      alert("Something went wrong.");
+      toast.error("Something went wrong.");
     }
   }
 

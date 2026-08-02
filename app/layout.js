@@ -1,6 +1,7 @@
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import ToastProvider from "@/components/ui/ToastProvider";
 
 export const metadata = {
   title: {
@@ -26,6 +27,8 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" data-scroll-behavior="smooth">
       <body className="bg-gray-50 text-gray-900 flex min-h-screen flex-col">
+        <ToastProvider />
+
         <Navbar />
 
         <main className="flex-1">{children}</main>

@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 export default function AddProjectPage() {
   const router = useRouter();
@@ -72,11 +73,11 @@ export default function AddProjectPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        alert(data.error || data.message || "Failed to add project.");
+        toast.error(data.error || data.message || "Failed to add project");
         return;
       }
 
-      alert(data.message || "Project added successfully!");
+      toast.success(data.message || "Project added successfully!");
 
       // Reset form
       setForm({
@@ -96,9 +97,9 @@ export default function AddProjectPage() {
 
       // Redirect (after Sprint 3 creates this page)
       // router.push("/admin/projects");
-    } catch (error) {
-      console.error(error);
-      alert("Something went wrong.");
+    } catch (err) {
+      console.error(err);
+      toast.error("Something went wrong.");
     } finally {
       setLoading(false);
     }

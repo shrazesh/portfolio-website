@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
-
+import toast from "react-hot-toast";
 export default function EditProjectPage() {
   const { id } = useParams();
   const router = useRouter();
@@ -25,13 +25,13 @@ export default function EditProjectPage() {
       try {
         const res = await fetch(`/api/projects/${id}`);
 
-        if (!res.ok) {
-          alert("Project not found");
+        const result = await res.json();
+
+        if (!res.ok || !result.success) {
+          toast.error(result.message || "Project not found");
           router.push("/admin/projects");
           return;
         }
-
-        const result = await res.json();
 
         const project = result.data;
 
@@ -40,7 +40,7 @@ export default function EditProjectPage() {
           slug: project.slug || "",
           image: project.image || "",
           description: project.description || "",
-          tech: project.tech?.join(", ") || "",
+          tech: Array.isArray(project.tech) ? project.tech.join(", ") : "",
           github: project.github || "",
           live: project.live || "",
         });
@@ -48,11 +48,13 @@ export default function EditProjectPage() {
         setLoading(false);
       } catch (err) {
         console.error(err);
-        alert("Failed to load project.");
+        toast.error("Failed to load project.");
       }
     }
 
-    loadProject();
+    if (id) {
+      loadProject();
+    }
   }, [id, router]);
 
   function handleChange(e) {
@@ -79,14 +81,14 @@ export default function EditProjectPage() {
       }),
     });
 
-    const result = await res.json();
+    const data = await res.json();
 
     if (!res.ok) {
-      alert(result.message || "Update failed");
+      toast.error(data.message || "Update failed");
       return;
     }
 
-    alert(result.message);
+    toast.success("Project updated successfully!");
 
     router.push("/admin/projects");
     router.refresh();
