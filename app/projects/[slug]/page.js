@@ -66,7 +66,7 @@ export default async function ProjectDetails({ params }) {
 
       <Link
         href="/projects"
-        className="inline-flex items-center text-blue-600 font-medium hover:underline"
+        className="inline-flex items-center text-accent font-medium hover:underline"
       >
         ← Back to Projects
       </Link>
@@ -89,7 +89,7 @@ export default async function ProjectDetails({ params }) {
 
       {/* Description */}
 
-      <p className="mt-6 text-lg text-gray-600 leading-8">
+      <p className="mt-6 text-lg text-slate-600 leading-8">
         {project.description}
       </p>
 
@@ -99,7 +99,7 @@ export default async function ProjectDetails({ params }) {
         {project.tech?.map((tech) => (
           <span
             key={tech}
-            className="px-4 py-2 rounded-full bg-gray-100 text-sm font-medium"
+            className="px-4 py-2 rounded-full bg-slate-50 text-sm font-medium"
           >
             {tech}
           </span>
@@ -114,7 +114,7 @@ export default async function ProjectDetails({ params }) {
             href={project.github}
             target="_blank"
             rel="noopener noreferrer"
-            className="px-6 py-3 rounded-lg bg-black text-white font-semibold hover:opacity-90 transition"
+            className="px-6 py-3 rounded-lg bg-slate-900 text-white font-semibold hover:opacity-90 transition"
           >
             View GitHub
           </a>

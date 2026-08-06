@@ -27,7 +27,7 @@ export default async function BlogPage() {
       {blogs.length === 0 ? (
         <div className="text-center py-20">
           <h2 className="text-2xl font-semibold">No blogs found.</h2>
-          <p className="text-gray-500 mt-2">
+          <p className="text-slate-600 mt-2">
             Create your first blog from the Admin Dashboard.
           </p>
         </div>
@@ -53,15 +53,15 @@ export default async function BlogPage() {
                 )}
 
                 <div className="p-5">
-                  <span className="text-sm text-blue-600 font-medium">
+                  <span className="text-sm text-accent font-medium">
                     {blog.category}
                   </span>
 
-                  <h2 className="text-2xl font-bold mt-2 group-hover:text-blue-600 transition">
+                  <h2 className="text-2xl font-bold mt-2 group-hover:text-accent transition">
                     {blog.title}
                   </h2>
 
-                  <p className="text-gray-600 mt-3 line-clamp-3">
+                  <p className="text-slate-600 mt-3 line-clamp-3">
                     {blog.excerpt}
                   </p>
 
@@ -69,7 +69,7 @@ export default async function BlogPage() {
                     {blog.tags?.map((tag) => (
                       <span
                         key={tag}
-                        className="bg-gray-100 text-sm px-2 py-1 rounded"
+                        className="bg-slate-50 text-sm px-2 py-1 rounded"
                       >
                         #{tag}
                       </span>

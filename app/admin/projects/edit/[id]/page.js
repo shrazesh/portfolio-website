@@ -103,7 +103,7 @@ export default function EditProjectPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 py-12 px-4">
+    <div className="min-h-screen bg-slate-50 py-12 px-4">
       <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl p-10">
         <h1 className="text-4xl font-bold mb-10">Edit Project</h1>
 
@@ -181,7 +181,7 @@ export default function EditProjectPage() {
           <div className="flex gap-4 pt-4">
             <button
               type="submit"
-              className="bg-black text-white px-8 py-3 rounded-lg hover:bg-gray-900"
+              className="bg-slate-900 text-white px-8 py-3 rounded-lg hover:bg-gray-900"
             >
               Update Project
             </button>
@@ -189,7 +189,7 @@ export default function EditProjectPage() {
             <button
               type="button"
               onClick={() => router.back()}
-              className="border px-8 py-3 rounded-lg hover:bg-gray-100"
+              className="border px-8 py-3 rounded-lg hover:bg-slate-50"
             >
               Cancel
             </button>

@@ -4,39 +4,53 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 export default function Navbar() {
-  const path = usePathname();
+  const pathname = usePathname();
 
-  const navLink = (href, label) => (
-    <Link
-      href={href}
-      className={`px-3 py-2 rounded-md transition ${
-        path === href
-          ? "bg-blue-600 text-white"
-          : "text-gray-700 hover:text-blue-600"
-      }`}
-    >
-      {label}
-    </Link>
-  );
+  const links = [
+    { href: "/", label: "Home" },
+    { href: "/about", label: "About" },
+    { href: "/projects", label: "Projects" },
+    { href: "/blog", label: "Blog" },
+    { href: "/contact", label: "Contact" },
+  ];
 
   return (
-    <nav className="w-full border-b bg-white shadow-sm">
-      <div className="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+    <nav className="sticky top-0 z-50 w-full bg-white border-b border-slate-200 shadow-sm">
+      <div className="max-w-7xl mx-auto h-20 px-6 flex items-center justify-between">
         {/* Logo */}
         <Link
           href="/"
-          className="text-3xl font-bold hover:text-blue-600 transition-colors duration-300"
+          className="text-3xl font-bold text-slate-900 hover:text-blue-600 transition-colors"
         >
           Shrajesh
         </Link>
 
-        {/* Links */}
-        <div className="flex gap-6 text-lg font-medium">
-          {navLink("/", "Home")}
-          {navLink("/about", "About")}
-          {navLink("/projects", "Projects")}
-          {navLink("/blog", "Blog")}
-          {navLink("/contact", "Contact")}
+        {/* Navigation */}
+        <div className="flex items-center gap-8">
+          {links.map((link) => {
+            const active = pathname === link.href;
+
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`relative text-lg font-medium transition-colors duration-300 ${
+                  active
+                    ? "text-blue-600"
+                    : "text-slate-900 hover:text-blue-600"
+                }`}
+              >
+                {link.label}
+
+                {/* Active underline */}
+                <span
+                  className={`absolute left-0 -bottom-2 h-[2px] bg-blue-600 transition-all duration-300 ${
+                    active ? "w-full" : "w-0"
+                  }`}
+                />
+              </Link>
+            );
+          })}
         </div>
       </div>
     </nav>

@@ -22,20 +22,15 @@ export default function BlogList({ blogs }) {
 
   return (
     <div className="max-w-6xl mx-auto py-10 px-6">
-
       <div className="flex justify-between items-center mb-8">
-
-        <h1 className="text-4xl font-bold">
-          Manage Blogs
-        </h1>
+        <h1 className="text-4xl font-bold">Manage Blogs</h1>
 
         <Link
           href="/admin/add-blog"
-          className="bg-black text-white px-5 py-3 rounded-lg hover:bg-gray-900"
+          className="bg-slate-900 text-white px-5 py-3 rounded-lg hover:bg-gray-900"
         >
           + Add Blog
         </Link>
-
       </div>
 
       <SearchBar
@@ -46,53 +41,37 @@ export default function BlogList({ blogs }) {
 
       {filteredBlogs.length === 0 ? (
         <div className="bg-white rounded-xl shadow p-10 text-center">
-          <h2 className="text-2xl font-semibold">
-            No blogs found
-          </h2>
+          <h2 className="text-2xl font-semibold">No blogs found</h2>
 
-          <p className="text-gray-500 mt-2">
-            Try another keyword.
-          </p>
+          <p className="text-slate-600 mt-2">Try another keyword.</p>
         </div>
       ) : (
         <div className="space-y-4">
-
           {filteredBlogs.map((blog) => (
             <div
               key={blog._id}
               className="bg-white rounded-xl shadow p-5 flex justify-between items-center"
             >
               <div>
+                <h2 className="text-xl font-bold">{blog.title}</h2>
 
-                <h2 className="text-xl font-bold">
-                  {blog.title}
-                </h2>
+                <p className="text-slate-600">{blog.category}</p>
 
-                <p className="text-gray-500">
-                  {blog.category}
-                </p>
-
-                <p className="text-gray-400 text-sm">
-                  {blog.slug}
-                </p>
-
+                <p className="text-gray-400 text-sm">{blog.slug}</p>
               </div>
 
               <div className="flex gap-3">
-
                 <Link
                   href={`/admin/blogs/edit/${blog._id}`}
-                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+                  className="bg-accent text-white px-4 py-2 rounded-lg hover:bg-blue-700"
                 >
                   Edit
                 </Link>
 
                 <DeleteBlogButton id={blog._id} />
-
               </div>
             </div>
           ))}
-
         </div>
       )}
     </div>

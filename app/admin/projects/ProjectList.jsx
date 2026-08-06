@@ -26,7 +26,7 @@ export default function ProjectList({ projects }) {
 
         <Link
           href="/admin/add-project"
-          className="bg-black text-white px-5 py-3 rounded-lg"
+          className="bg-slate-900 text-white px-5 py-3 rounded-lg"
         >
           + Add Project
         </Link>
@@ -41,7 +41,7 @@ export default function ProjectList({ projects }) {
       <div className="space-y-4">
         {filteredProjects.length === 0 ? (
           <div className="bg-white shadow rounded-xl p-8 text-center">
-            <p className="text-gray-500">No matching projects found.</p>
+            <p className="text-slate-600">No matching projects found.</p>
           </div>
         ) : (
           filteredProjects.map((project) => (
@@ -52,13 +52,13 @@ export default function ProjectList({ projects }) {
               <div>
                 <h2 className="font-bold text-lg">{project.title}</h2>
 
-                <p className="text-gray-500">{project.slug}</p>
+                <p className="text-slate-600">{project.slug}</p>
               </div>
 
               <div className="flex gap-3">
                 <Link
                   href={`/admin/projects/edit/${project._id}`}
-                  className="bg-blue-600 text-white px-4 py-2 rounded-lg"
+                  className="bg-accent text-white px-4 py-2 rounded-lg"
                 >
                   Edit
                 </Link>

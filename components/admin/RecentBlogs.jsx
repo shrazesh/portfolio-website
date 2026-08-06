@@ -20,14 +20,14 @@ export default function RecentBlogs({ blogs }) {
                 {blog.title}
               </h3>
 
-              <p className="text-gray-500 text-sm">
+              <p className="text-slate-600 text-sm">
                 {blog.category}
               </p>
             </div>
 
             <Link
               href={`/admin/blogs/edit/${blog._id}`}
-              className="text-blue-600"
+              className="text-accent"
             >
               Edit
             </Link>

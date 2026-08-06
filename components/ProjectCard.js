@@ -18,12 +18,12 @@ export default function ProjectCard({ project }) {
 
         {/* Content */}
         <div className="mt-5 flex flex-col flex-grow">
-          <h2 className="text-2xl font-semibold group-hover:text-blue-600 transition">
+          <h2 className="text-2xl font-semibold group-hover:text-accent transition">
             {project.title}
           </h2>
 
           {/* Same height description */}
-          <p className="text-gray-600 mt-2 line-clamp-3 flex-grow">
+          <p className="text-slate-600 mt-2 line-clamp-3 flex-grow">
             {project.description}
           </p>
 
@@ -32,7 +32,7 @@ export default function ProjectCard({ project }) {
             {(project.tech || []).map((tech, i) => (
               <span
                 key={i}
-                className="bg-gray-100 border px-3 py-1 rounded-full text-sm"
+                className="bg-slate-50 border px-3 py-1 rounded-full text-sm"
               >
                 {tech}
               </span>

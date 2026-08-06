@@ -29,7 +29,7 @@ export default async function AdminDashboard() {
   });
 
   return (
-    <div className="min-h-screen bg-gray-100 p-10">
+    <div className="min-h-screen bg-slate-50 p-10">
       <h1 className="text-4xl font-bold mb-10">Portfolio Dashboard</h1>
 
       {/* Statistics */}

@@ -109,7 +109,7 @@ export default function EditBlogPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 py-12 px-4">
+    <div className="min-h-screen bg-slate-50 py-12 px-4">
       <div className="max-w-5xl mx-auto bg-white rounded-2xl shadow-xl p-10">
         <h1 className="text-4xl font-bold mb-8">Edit Blog</h1>
 
@@ -195,7 +195,7 @@ export default function EditBlogPage() {
           <div className="flex gap-4">
             <button
               type="submit"
-              className="bg-black text-white px-8 py-3 rounded-lg"
+              className="bg-slate-900 text-white px-8 py-3 rounded-lg"
             >
               Update Blog
             </button>

@@ -10,7 +10,7 @@ export default function StatsCard({
     >
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-gray-500 text-sm">{title}</p>
+          <p className="text-slate-600 text-sm">{title}</p>
 
           <h2 className="text-3xl font-bold mt-2">
             {value}

@@ -28,7 +28,7 @@ export default async function ProjectsPage() {
       <h1 className="text-4xl font-bold text-center mb-14">My Projects</h1>
 
       {projects.length === 0 ? (
-        <p className="text-center text-gray-500">No projects found.</p>
+        <p className="text-center text-slate-600">No projects found.</p>
       ) : (
         <div className="grid md:grid-cols-2 gap-12">
           {projects.map((project) => (

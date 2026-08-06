@@ -57,7 +57,7 @@ export default function Contact() {
           onChange={(e) => setForm({ ...form, message: e.target.value })}
         />
 
-        <button className="bg-black text-white px-6 py-3 rounded">
+        <button className="bg-slate-900 text-white px-6 py-3 rounded">
           Send Message
         </button>
       </form>

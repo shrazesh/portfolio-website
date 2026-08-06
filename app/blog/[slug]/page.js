@@ -41,7 +41,7 @@ export default async function BlogDetails({ params }) {
   return (
     <div className="max-w-5xl mx-auto px-6 py-12">
       {/* Back */}
-      <Link href="/blog" className="text-blue-600 hover:underline font-medium">
+      <Link href="/blog" className="text-accent hover:underline font-medium">
         ← Back to Blogs
       </Link>
 
@@ -70,7 +70,7 @@ export default async function BlogDetails({ params }) {
       <h1 className="text-5xl font-bold mt-4">{blog.title}</h1>
 
       {/* Date */}
-      <p className="text-gray-500 mt-3">
+      <p className="text-slate-600 mt-3">
         Published on {new Date(blog.createdAt).toLocaleDateString()}
       </p>
 
@@ -80,7 +80,7 @@ export default async function BlogDetails({ params }) {
           {blog.tags.map((tag) => (
             <span
               key={tag}
-              className="bg-gray-100 px-3 py-1 rounded-full text-sm"
+              className="bg-slate-50 px-3 py-1 rounded-full text-sm"
             >
               #{tag}
             </span>
@@ -90,7 +90,7 @@ export default async function BlogDetails({ params }) {
 
       {/* Excerpt */}
       {blog.excerpt && (
-        <p className="text-xl text-gray-600 mt-8 italic">{blog.excerpt}</p>
+        <p className="text-xl text-slate-600 mt-8 italic">{blog.excerpt}</p>
       )}
 
       {/* Content */}
@@ -103,7 +103,7 @@ export default async function BlogDetails({ params }) {
         {previousBlog ? (
           <Link
             href={`/blog/${previousBlog.slug}`}
-            className="text-blue-600 hover:underline"
+            className="text-accent hover:underline"
           >
             ← {previousBlog.title}
           </Link>
@@ -114,7 +114,7 @@ export default async function BlogDetails({ params }) {
         {nextBlog ? (
           <Link
             href={`/blog/${nextBlog.slug}`}
-            className="text-blue-600 hover:underline"
+            className="text-accent hover:underline"
           >
             {nextBlog.title} →
           </Link>

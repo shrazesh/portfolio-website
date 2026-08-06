@@ -20,14 +20,14 @@ export default function RecentProjects({ projects }) {
                 {project.title}
               </h3>
 
-              <p className="text-gray-500 text-sm">
+              <p className="text-slate-600 text-sm">
                 {project.slug}
               </p>
             </div>
 
             <Link
               href={`/admin/projects/edit/${project._id}`}
-              className="text-blue-600"
+              className="text-accent"
             >
               Edit
             </Link>

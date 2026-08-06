@@ -106,7 +106,7 @@ export default function AddProjectPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-5xl bg-white rounded-2xl shadow-xl p-10">
         <h1 className="text-4xl font-bold text-center mb-10">
           Add New Project
@@ -118,7 +118,7 @@ export default function AddProjectPage() {
               label="Project Title"
               name="title"
               value={form.title}
-              placeholder="Calorie Tracker"
+              placeholder="Project name"
               onChange={handleChange}
             />
 
@@ -186,7 +186,7 @@ export default function AddProjectPage() {
             <button
               type="submit"
               disabled={loading}
-              className="bg-black text-white px-10 py-3 rounded-lg font-semibold hover:bg-gray-900 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-slate-900 text-white px-10 py-3 rounded-lg font-semibold hover:bg-gray-900 transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? "Adding Project..." : "Add Project"}
             </button>
