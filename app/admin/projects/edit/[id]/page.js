@@ -1,14 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import toast from "react-hot-toast";
+
 export default function EditProjectPage() {
   const { id } = useParams();
   const router = useRouter();
+  const fileRef = useRef(null);
 
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
   const [form, setForm] = useState({
     title: "",
@@ -20,6 +23,13 @@ export default function EditProjectPage() {
     live: "",
   });
 
+  // Stores the newly selected image file
+  const [imageFile, setImageFile] = useState(null);
+
+  // Preview of newly selected image
+  const [preview, setPreview] = useState("");
+
+  // Load existing project
   useEffect(() => {
     async function loadProject() {
       try {
@@ -47,8 +57,9 @@ export default function EditProjectPage() {
 
         setLoading(false);
       } catch (err) {
-        console.error(err);
+        console.error("Load project error:", err);
         toast.error("Failed to load project.");
+        setLoading(false);
       }
     }
 
@@ -57,41 +68,107 @@ export default function EditProjectPage() {
     }
   }, [id, router]);
 
+  // Clean up preview URL when component unmounts
+  useEffect(() => {
+    return () => {
+      if (preview) {
+        URL.revokeObjectURL(preview);
+      }
+    };
+  }, [preview]);
+
   function handleChange(e) {
-    setForm({
-      ...form,
+    setForm((prev) => ({
+      ...prev,
       [e.target.name]: e.target.value,
-    });
+    }));
+  }
+
+  // Handle new image selection
+  function handleFileChange(e) {
+    const file = e.target.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    // Only allow images
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please select a valid image file.");
+      e.target.value = "";
+      return;
+    }
+
+    // Maximum 5 MB
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Image size must be less than 5 MB.");
+      e.target.value = "";
+      return;
+    }
+
+    // Remove previous preview URL
+    if (preview) {
+      URL.revokeObjectURL(preview);
+    }
+
+    setImageFile(file);
+    setPreview(URL.createObjectURL(file));
   }
 
   async function handleSubmit(e) {
     e.preventDefault();
 
-    const res = await fetch(`/api/projects/${id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        ...form,
-        tech: form.tech
-          .split(",")
-          .map((t) => t.trim())
-          .filter(Boolean),
-      }),
-    });
+    if (saving) return;
 
-    const data = await res.json();
+    setSaving(true);
 
-    if (!res.ok) {
-      toast.error(data.message || "Update failed");
-      return;
+    try {
+      const formData = new FormData();
+
+      formData.append("title", form.title.trim());
+      formData.append("slug", form.slug.trim());
+      formData.append("description", form.description.trim());
+
+      formData.append(
+        "tech",
+        JSON.stringify(
+          form.tech
+            .split(",")
+            .map((item) => item.trim())
+            .filter(Boolean),
+        ),
+      );
+
+      formData.append("github", form.github.trim());
+      formData.append("live", form.live.trim());
+
+      // Only send image if user selected a NEW image
+      if (imageFile) {
+        formData.append("image", imageFile);
+      }
+
+      const res = await fetch(`/api/projects/${id}`, {
+        method: "PUT",
+        body: formData,
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        toast.error(data.message || data.error || "Failed to update project");
+        return;
+      }
+
+      toast.success(data.message || "Project updated successfully!");
+
+      router.push("/admin/projects");
+      router.refresh();
+    } catch (err) {
+      console.error("Update project error:", err);
+      toast.error("Something went wrong while updating the project.");
+    } finally {
+      setSaving(false);
     }
-
-    toast.success("Project updated successfully!");
-
-    router.push("/admin/projects");
-    router.refresh();
   }
 
   if (loading) {
@@ -108,6 +185,7 @@ export default function EditProjectPage() {
         <h1 className="text-4xl font-bold mb-10">Edit Project</h1>
 
         <form onSubmit={handleSubmit} className="space-y-8">
+          {/* Project Title */}
           <Input
             label="Project Title"
             name="title"
@@ -115,6 +193,7 @@ export default function EditProjectPage() {
             onChange={handleChange}
           />
 
+          {/* Slug */}
           <Input
             label="Slug"
             name="slug"
@@ -122,29 +201,69 @@ export default function EditProjectPage() {
             onChange={handleChange}
           />
 
+          {/* Current Image */}
           {form.image && (
             <div>
-              <label className="block mb-3 font-semibold">Current Image</label>
+              <label className="block mb-3 font-semibold">
+                Current Project Image
+              </label>
 
-              <div className="relative w-full h-72 rounded-xl overflow-hidden border">
+              <div className="relative w-full h-72 rounded-xl overflow-hidden border bg-slate-100">
                 <Image
                   src={form.image}
-                  alt={form.title}
+                  alt={form.title || "Current project image"}
                   fill
-                  sizes="100vw"
+                  sizes="(max-width: 768px) 100vw, 896px"
                   className="object-cover"
                 />
               </div>
             </div>
           )}
 
-          <Input
-            label="Image URL"
-            name="image"
-            value={form.image}
-            onChange={handleChange}
-          />
+          {/* New Project Image */}
+          <div>
+            <label className="block mb-2 font-semibold">
+              Change Project Image
+            </label>
 
+            <input
+              ref={fileRef}
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              className="w-full border rounded-lg p-3 bg-white"
+            />
+
+            <p className="text-sm text-gray-500 mt-2">
+              Leave this empty to keep the current image. Maximum size: 5 MB.
+            </p>
+          </div>
+
+          {/* New Image Preview */}
+          {preview && (
+            <div>
+              <label className="block mb-3 font-semibold">
+                New Image Preview
+              </label>
+
+              <div className="relative w-full h-72 rounded-xl overflow-hidden border bg-slate-100">
+                <Image
+                  src={preview}
+                  alt="New project image preview"
+                  fill
+                  sizes="(max-width: 768px) 100vw, 896px"
+                  className="object-cover"
+                />
+              </div>
+
+              <p className="text-sm text-green-600 mt-2">
+                New image selected. It will replace the current image when you
+                update the project.
+              </p>
+            </div>
+          )}
+
+          {/* Tech Stack */}
           <Input
             label="Tech Stack"
             name="tech"
@@ -152,6 +271,7 @@ export default function EditProjectPage() {
             onChange={handleChange}
           />
 
+          {/* Description */}
           <div>
             <label className="block mb-2 font-semibold">Description</label>
 
@@ -160,10 +280,11 @@ export default function EditProjectPage() {
               name="description"
               value={form.description}
               onChange={handleChange}
-              className="w-full border rounded-lg p-4"
+              className="w-full border rounded-lg p-4 focus:ring-2 focus:ring-black outline-none"
             />
           </div>
 
+          {/* GitHub */}
           <Input
             label="GitHub URL"
             name="github"
@@ -171,6 +292,7 @@ export default function EditProjectPage() {
             onChange={handleChange}
           />
 
+          {/* Live */}
           <Input
             label="Live Demo URL"
             name="live"
@@ -178,18 +300,21 @@ export default function EditProjectPage() {
             onChange={handleChange}
           />
 
+          {/* Buttons */}
           <div className="flex gap-4 pt-4">
             <button
               type="submit"
-              className="bg-slate-900 text-white px-8 py-3 rounded-lg hover:bg-gray-900"
+              disabled={saving}
+              className="bg-slate-900 text-white px-8 py-3 rounded-lg hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Update Project
+              {saving ? "Updating Project..." : "Update Project"}
             </button>
 
             <button
               type="button"
               onClick={() => router.back()}
-              className="border px-8 py-3 rounded-lg hover:bg-slate-50"
+              disabled={saving}
+              className="border px-8 py-3 rounded-lg hover:bg-slate-50 disabled:opacity-50"
             >
               Cancel
             </button>

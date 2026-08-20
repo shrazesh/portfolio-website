@@ -162,7 +162,7 @@ export default function AddBlogPage() {
           <div>
             <label className="block mb-2 font-semibold">Cover Image</label>
 
-            <input type="file" accept="image/*" onChange={handleImage} />
+            <Input type="file" accept="image/*" onChange={handleImage} />
           </div>
 
           <div className="flex gap-8">

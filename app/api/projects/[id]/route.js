@@ -1,11 +1,25 @@
 import { connectDB } from "@/lib/mongodb";
 import Project from "@/models/Project";
+import { uploadBuffer } from "@/lib/cloudinary";
 import { NextResponse } from "next/server";
+import mongoose from "mongoose";
 
 // GET single project
 export async function GET(request, { params }) {
   try {
     const { id } = await params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Invalid project ID",
+        },
+        {
+          status: 400,
+        },
+      );
+    }
 
     await connectDB();
 
@@ -28,10 +42,12 @@ export async function GET(request, { params }) {
       data: project,
     });
   } catch (error) {
+    console.error("GET project error:", error);
+
     return NextResponse.json(
       {
         success: false,
-        message: error.message,
+        message: "Failed to fetch project",
       },
       {
         status: 500,
@@ -40,16 +56,148 @@ export async function GET(request, { params }) {
   }
 }
 
-// UPDATE
+// UPDATE project
 export async function PUT(request, { params }) {
   try {
     const { id } = await params;
 
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Invalid project ID",
+        },
+        {
+          status: 400,
+        },
+      );
+    }
+
     await connectDB();
 
-    const body = await request.json();
+    // Read multipart/form-data
+    const formData = await request.formData();
 
-    const project = await Project.findByIdAndUpdate(id, body, {
+    const title = formData.get("title")?.toString().trim() || "";
+    const slug = formData.get("slug")?.toString().trim() || "";
+    const description = formData.get("description")?.toString().trim() || "";
+
+    const github = formData.get("github")?.toString().trim() || "";
+    const live = formData.get("live")?.toString().trim() || "";
+
+    const techString = formData.get("tech")?.toString() || "[]";
+
+    let tech = [];
+
+    try {
+      tech = JSON.parse(techString);
+
+      if (!Array.isArray(tech)) {
+        tech = [];
+      }
+    } catch {
+      tech = [];
+    }
+
+    // Basic validation
+    if (!title) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Project title is required",
+        },
+        {
+          status: 400,
+        },
+      );
+    }
+
+    if (!slug) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Project slug is required",
+        },
+        {
+          status: 400,
+        },
+      );
+    }
+
+    // Build update object
+    const updateData = {
+      title,
+      slug,
+      description,
+      tech,
+      github,
+      live,
+    };
+
+    /*
+      IMPORTANT:
+
+      We only update the image if a NEW file was selected.
+
+      If the user does not choose a file,
+      updateData.image is NOT added.
+
+      Therefore MongoDB keeps the existing image.
+    */
+
+    const imageFile = formData.get("image");
+
+    if (imageFile && typeof imageFile !== "string" && imageFile.size > 0) {
+      // Validate image type
+      if (!imageFile.type.startsWith("image/")) {
+        return NextResponse.json(
+          {
+            success: false,
+            message: "Please upload a valid image file",
+          },
+          {
+            status: 400,
+          },
+        );
+      }
+
+      // Maximum 5 MB
+      if (imageFile.size > 5 * 1024 * 1024) {
+        return NextResponse.json(
+          {
+            success: false,
+            message: "Image size must be less than 5 MB",
+          },
+          {
+            status: 400,
+          },
+        );
+      }
+
+      // Convert File → Buffer
+      const arrayBuffer = await imageFile.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+
+      // Upload new image to Cloudinary
+      const uploadedImage = await uploadBuffer(buffer, "portfolio/projects");
+
+      if (!uploadedImage?.secure_url) {
+        return NextResponse.json(
+          {
+            success: false,
+            message: "Image upload failed",
+          },
+          {
+            status: 500,
+          },
+        );
+      }
+
+      updateData.image = uploadedImage.secure_url;
+    }
+
+    // Update MongoDB
+    const project = await Project.findByIdAndUpdate(id, updateData, {
       new: true,
       runValidators: true,
     });
@@ -72,10 +220,25 @@ export async function PUT(request, { params }) {
       data: project,
     });
   } catch (error) {
+    console.error("PUT project error:", error);
+
+    // Duplicate slug
+    if (error?.code === 11000) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "A project with this slug already exists.",
+        },
+        {
+          status: 409,
+        },
+      );
+    }
+
     return NextResponse.json(
       {
         success: false,
-        message: error.message,
+        message: error.message || "Failed to update project",
       },
       {
         status: 500,
@@ -84,10 +247,22 @@ export async function PUT(request, { params }) {
   }
 }
 
-// DELETE
+// DELETE project
 export async function DELETE(request, { params }) {
   try {
     const { id } = await params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Invalid project ID",
+        },
+        {
+          status: 400,
+        },
+      );
+    }
 
     await connectDB();
 
@@ -110,10 +285,12 @@ export async function DELETE(request, { params }) {
       message: "Project deleted successfully!",
     });
   } catch (error) {
+    console.error("DELETE project error:", error);
+
     return NextResponse.json(
       {
         success: false,
-        message: error.message,
+        message: "Failed to delete project",
       },
       {
         status: 500,
