@@ -3,6 +3,7 @@ import Project from "@/models/Project";
 import { uploadBuffer } from "@/lib/cloudinary";
 import { NextResponse } from "next/server";
 import mongoose from "mongoose";
+import { getAdminFromRequest } from "@/lib/auth";
 
 // GET single project
 export async function GET(request, { params }) {
@@ -57,8 +58,25 @@ export async function GET(request, { params }) {
 }
 
 // UPDATE project
+// PROTECTED - admin authentication required
 export async function PUT(request, { params }) {
   try {
+    // ADMIN AUTHENTICATION
+    // ==========================
+    const admin = await getAdminFromRequest(request);
+
+    if (!admin) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Unauthorized. Admin login required.",
+        },
+        {
+          status: 401,
+        },
+      );
+    }
+
     const { id } = await params;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -149,11 +167,13 @@ export async function PUT(request, { params }) {
 
     if (imageFile && typeof imageFile !== "string" && imageFile.size > 0) {
       // Validate image type
-      if (!imageFile.type.startsWith("image/")) {
+      const allowedImageTypes = ["image/jpeg", "image/png", "image/webp"];
+
+      if (!allowedImageTypes.includes(imageFile.type)) {
         return NextResponse.json(
           {
             success: false,
-            message: "Please upload a valid image file",
+            message: "Only JPG, PNG and WebP images are allowed.",
           },
           {
             status: 400,
@@ -166,7 +186,7 @@ export async function PUT(request, { params }) {
         return NextResponse.json(
           {
             success: false,
-            message: "Image size must be less than 5 MB",
+            message: "Image size must be less than 5 MB.",
           },
           {
             status: 400,
@@ -248,8 +268,25 @@ export async function PUT(request, { params }) {
 }
 
 // DELETE project
+// PROTECTED - admin authentication required
 export async function DELETE(request, { params }) {
   try {
+    // ADMIN AUTHENTICATION
+    // ==========================
+    const admin = await getAdminFromRequest(request);
+
+    if (!admin) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Unauthorized. Admin login required.",
+        },
+        {
+          status: 401,
+        },
+      );
+    }
+
     const { id } = await params;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
